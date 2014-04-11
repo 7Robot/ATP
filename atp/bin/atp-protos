@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import sys
+from atp.protos import load, cformats
+
+def print_protos(protos):
+    for proto in protos:
+        p = protos[proto]
+        print("%s: (board %d)" %(proto, p['id']))
+        for packet in p['packets']:
+            pa = p['packets'][packet]
+            print("  [%3d, %4s] %s" %(pa['id'], pa['transmitter'], packet))
+            for arg in pa['args']:
+                format = pa['args'][arg]
+                print("      %-10s \t(%s)" %(arg, cformats[format]))
+
+if __name__ == "__main__":
+
+    if len(sys.argv) != 2:
+        print("Usage: %s <semantic file>" %sys.argv[0])
+        sys.exit(1)
+
+    protos = load(sys.argv[1])
+    print_protos(protos)

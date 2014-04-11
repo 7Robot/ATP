@@ -6,7 +6,7 @@ setup(
     author='Élie Bouttier',
     author_email='elie+7robot@bouttier.eu.org',
     packages=['atp'],
-    scripts=['bin/atp-encode', 'bin/atp-decode'],
+    scripts=['bin/atp-encode', 'bin/atp-decode', 'bin/atp-protos'],
     url='http://7robot.fr',
     description='7Robot Eurobot - ATP module.',
 )
