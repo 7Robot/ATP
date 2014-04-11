@@ -1,0 +1,87 @@
+Format des paquets
+==================
+
+Tous paquet est constitué d’une succession de variable. Il doit en contenir au
+moins une : sont id, les autres variables étant alors appelés arguments.
+
+Une variable est un groupe d’au moins 2 octets, dont le premier donne le type
+de cette variable. Ce type permet de savoir sur combien d’octet est codé la
+valeur de cette variable. Dans l’exemple suivant, nous avons affaire à une
+variable dont la valeur est codé sur 4 octets.
+
+[ TYPE ] [ B3 ] [ B2 ] [ B1 ] [ B0 ]
+
+Afin de faciliter le décodage, les 4 bits de poid faible de l’octet TYPE donne
+le nombre d’octet codant la valeur de la variable. Dans l’exemple précédent, on
+sait que l’octet TYPE se termine par 0b0100 = 4 octets.
+
+Afin de pouvoir séparer les paquets les uns des autres, deux types spéciaux ont
+été introduit afin de marquer le début et la fin du paquet. Le type désignant
+le début d’un paquet a pour valeur 129 = 0b 1000 0001 (0x81). Conformément à la norme
+précédemment énnoncé sur les 4 bits de poids faible de l’octet de type,
+celui-ci doit être suivit par une variable codé sur un seul octet. Il sagit de
+l’id du packet, sous forme d’un entier non signé compris entre 0 et 255 inclus.
+
+Le type désignant la fin d’un paquet a pour valeur 128 = 0b 1000 0000, et n’est
+suivit par aucun octet toujours conformément à la norme sur les 4 bits de poids
+faibles des octets de type. C’est le seul qui ne puisse être suivit d’aucun
+octet, et cela ne doit pas changer.
+
+
+Définition des types
+====================
+129 = 0x81 = 1000 0001 = Début de trame
+  1 = 0x01 = 0000 0001 = unsigned char    (B)
+  2 = 0x02 = 0000 0010 = unsigned short   (H)
+  4 = 0x04 = 0000 0100 = unsigned int     (I)
+132 = 0x84 = 1000 0100 = timestamp        (I)
+148 = 0x94 = 1001 0100 = microseconds     (I)
+ 17 = 0x11 = 0001 0001 = signed char      (b)
+ 18 = 0x12 = 0001 0010 = signed short     (h)
+ 20 = 0x14 = 0001 0100 = signed int       (i)
+ 36 = 0x24 = 0010 0100 = unsigned float   (f)
+128 = 0x80 = 1000 0000 = Fin de trame
+
+Rappel : autre que le type 128, aucun ne peut avoir ses 4 bits de poids faible
+nuls.
+
+Les types 132 et 148 sont des alias pour le type 4, mais réservés pour
+l’horodatage des messages. Globalement, les types supérieurs à 128 sont
+particulier et sont réservé à un usage spécifique.
+
+Conformément à l’architecture des pics, on utilisera un codage little-endiend.
+
+Entre parenthèse est spécifié pour chaque type la lettre qui le désigne d’après
+le manuel d’utilisation des fonctions pack et unpack de module python struct.
+Elles sont utile à l’utilisation du programme encode.py et du programme
+decode.py.
+
+
+Identification des cartes
+=========================
+Afin de pouvoir identifier chaque périphérique, les id de paquets 254 et 255
+sont réservé à cet usage. Un paquet d’id 254, sans autre argument, peut être
+envoyer pour demander à un périphérique de s’identifier. Celui-ci répond alors
+par un paquet d’id 255 comportant un unique argument : un entier non signé sur
+un seul octet, de 0 à 255 inclus, désignant alors son identifiant de
+périphérique. Afin de ne pas confondre identifiant de paquet et identifiant de
+périphérique, nous préfèrerons parler son login. Le nom n’est pas si mal trouvé
+si on considère qu’un périphérique se « log » auprès de l’usbdaemon au moyen de
+son login pour être mit en relation avec le tcphub approprié.
+
+
+Répartition des id
+==================
+Les id peuvent être réutilisé d’un périphérique à l’autre puisque les messages
+circulent sur des flux distincts et non plus sur un bus commun. Cependant,
+certain id sont réservé à un usage commun entre toute les cartes.
+Pour voir la répartition des IDs, se référer à protos.py.
+
+ID réservés
+===========
+250 : réservé pour une utilisation futur
+251 : réservé pour une utilisation futur
+252 : message de test comportant tous les types possibles
+253 : signalisation d’une erreur
+254 : demande d’identification
+255 : identification
