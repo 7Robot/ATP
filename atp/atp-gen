@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+
+from atp.generator import PicGenerator
+
+
+if __name__=="__main__":
+
+    parser = argparse.ArgumentParser(description='Generate pic source code to encode and decode ATP paquet with semantic.')
+    parser.add_argument('semantic', help='Set semantic configuration file.')
+    parser.add_argument('dest', help='Set destination directory.')
+    parser.add_argument('-p', '--proto', dest='proto', help='Generate source code for a specific protocol/pic.')
+    args = parser.parse_args()
+
+    if args.proto:
+        proto = args.proto.capitalize()
+    else:
+        proto = "all"
+
+
+    print("Reading semantic from '%s'" %args.semantic)
+    print("Saving files in '%s'\n" %args.dest)
+    print("Generating files for %s protocol…\n" %proto)
+
+    generator = PicGenerator(args.semantic, args.dest)
+
+    if proto == "all":
+        generator.genAll()
+    else:
+        generator.genProto(proto, generator.protos[proto])
