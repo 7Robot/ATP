@@ -1,7 +1,14 @@
 Pour être compilé, cmake est nécessaire.
 
+Compilation :
+
     mkdir build
     cd build
     cmake ..
     make
+
+Installation :
+
     sudo make install
+
+Pour installer les composants python, cf atp/INSTALL.
