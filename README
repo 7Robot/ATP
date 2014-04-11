@@ -16,6 +16,7 @@ libatp: Petit bibliothèque contenant quelques fonctions atp utile au décodeur
 microstamp: Horodateur de message atp (timestamp & microsecondes)
 pic: Fichier commun nécessaire à l’utilisation de l’ATP sur pic
      (les autres fichiers sont généré par l’outil python atp-gen)
+semantic: Fichiers liés à la sémantique et donc susceptible de beaucoup évoluer.
 tcphub: Le tcphub et ses décoders de protocols, utile pour interconnecter les
         différents outils souhaitant communiquer avec le robot.
 usbdaemon: Démon interconnectant les boards branchées en USB au tcphub.
