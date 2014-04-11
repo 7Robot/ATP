@@ -1,11 +1,1 @@
-Pour utiliser le protocole ATP, le pic a besoin de 5 fichiers :
-- atp.c et atc.h
-Ces deux là ne doivent normalement pas être modifié (hormis éventuellement les
-lignes 137 et 138 de atp.c liées à l’uart, defaut de conception …).
-- atp-user.h
-Ce fichier définies les paramètres de l’utilisateur et doit probablement être
-modifié.
-- atp-asserv.c et atp-asserv.h, par exemple pour le pic d’asserv
-Ces deux fichiers sont autogénéré par le programme atp-gen en fonction du
-fichier de sémantique. Ils doivent être regénéré à chaque modification de la
-sémantique !
+atp: Contient les fichiers nécessaire pour utiliser l’atp sur pic.
