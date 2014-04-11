@@ -5,3 +5,17 @@ Les paquets ATP qui traverse microstamp sont horodatés.
 En effet, chaque paquet se voit rajouté deux arguments :
 - le timestamp (type 132)
 - le nombre de microseconde (type 148)
+
+Voici quelques exemples d’utilisation :
+
+# Horodate les données d’exemple du fichier atp-sample.bin et les enregistre
+# dans atp-sample-microstamp.bin :
+microstamp < atp-sample.bin > atp-sample-microstamp.bin
+
+# Horodate les paquets reçu depuis une socket et les enregistres dans un fichier
+# binaire :
+nc localhost 1305 | microstamp > log-1305.bin
+
+# Horodate les paquets reçu depuis une socket et les enregistres dans un fichier
+# binaire ainsi que décodé dans un fichier texte :
+nc localhost 1305 | microstanp | tee log-1305.bin | atp-decode > log-1305.txt
