@@ -2,16 +2,15 @@
 pkgname=7robot-eurobot-git
 pkgver=1.0
 pkgrel=1
-pkgdesc="7Robot Eurobot related source"
+pkgdesc="7Robot Eurobot - ATP related source"
 arch=(i686 x86_64)
 url="http://7robot.fr"
 license=('GPL')
 makedepends=('cmake')
 
 _gitteam="7Robot"
-_gitname="eurobot"
-#_gitroot="https://github.com/$_gitteam/$_gitname"
-_gitroot=".."
+_gitname="ATP"
+_gitroot="https://github.com/$_gitteam/$_gitname"
 
 build() {
   cd "$srcdir"
