@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "client.h"
+#include "libatp.h"
 
 typedef enum State {
     begin,
