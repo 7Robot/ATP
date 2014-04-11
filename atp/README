@@ -1,1 +1,25 @@
-This is a python module that provide atp.encode and atp.decode functions.
+Le module atp (Adaptative Transmission Protocol) fournit une fonction encode et
+une fonction decode. Voir en bas pour les exemples.
+
+La fonction encode prend en arguements un stream de type io.BufferedReader,
+un id de message, puis une liste de couple (valeur, format). Le format doit
+pouvoir être utilisé par struct.pack.
+Voici un rappel des formats les plus utiles :
+B   unsigned char
+H  unsigned short
+I  unsigned int
+b   signed char
+h  signed short
+i  signed int
+f  float
+
+La fonction decode prend en argument un stream de type io.BufferedReader ainsi
+qu’une fonction de callback qui sera appelé à chaque trame décodé avec en
+argument l’id de la trame ainsi qu’une liste contenant tous les arguments dans
+l’ordre dans lequel ils ont été reçu.
+
+Les fichiers encode.py et decode.py sont des exemples de programme s’appuyant
+sur le module atp pour encoder et décoder des trames. Vous pouvez les tester
+de la manière suivante :
+./decode.py < sample/atp-sample
+./encode.py 123 -78@i 22@H 5.326@f | ./decode.py
