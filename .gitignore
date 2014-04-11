@@ -1,3 +1,7 @@
 build
 *.swp
 *.pyc
+archlinux/pkg
+archlinux/src
+archlinux/*.pkg.tar.xz
+archlinux/*.src.tar.gz
