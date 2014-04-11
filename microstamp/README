@@ -1,0 +1,7 @@
+L’utilitaire « microstamp » agit comme un proxy ATP transparent.
+Il attend sur son entrée standard un flux ATP qu’il ressortira alors sur sa
+sortie standard.
+Les paquets ATP qui traverse microstamp sont horodatés.
+En effet, chaque paquet se voit rajouté deux arguments :
+- le timestamp (type 132)
+- le nombre de microseconde (type 148)
