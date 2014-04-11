@@ -80,10 +80,11 @@ def load_packet(packet):
 
     return p
 
-def load_proto(common, proto):
+def load_proto(version, common, proto):
 
     p = OrderedDict()
 
+    p['version'] = version
     p['id'] = proto.type
     p['packets'] = OrderedDict()
 
@@ -110,6 +111,6 @@ def load(conf):
     for name in l:
         if inspect.isclass(l[name]) and issubclass(l[name], Proto):
             if name != "Proto" and name != "Common":
-                protos[name] = load_proto(l["Common"], l[name])
+                protos[name] = load_proto(l["version"], l["Common"], l[name])
 
     return protos
