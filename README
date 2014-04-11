@@ -9,6 +9,8 @@ CMakeLists.txt: Nécessaire à cmake pour la compilation. cf INSTALL.
 archlinux: PKGBUILD pour faire un joli paquet pour Arch.
 atp: Module python contenant également quelques utilitaires très utiles
      (atp-encode, atp-decode, …)
+libasserv: Librairie d’asservissement. Prévu pour être compilé sur pic et sur
+           pc (avec wrapper python).
 libatp: Petit bibliothèque contenant quelques fonctions atp utile au décodeur
         atp du tcphub et à microstamp entre autres.
 microstamp: Horodateur de message atp (timestamp & microsecondes)
