@@ -7,6 +7,9 @@ arch=(i686 x86_64)
 url="http://7robot.fr"
 license=('GPL')
 makedepends=('cmake')
+backup=('etc/usbdaemon.conf')
+source=('usbdaemon.service')
+md5sums=('8e2fa5c16c72c4dddf073252292930f0')
 
 _gitteam="7Robot"
 _gitname="ATP"
@@ -39,4 +42,7 @@ package() {
 
   cd "$srcdir/$_gitname/atp"
   python setup.py install --root="$pkgdir"
+
+  cd "$srcdir"
+  install -Dm644 usbdaemon.service "$pkgdir"/usr/lib/systemd/system/usbdaemon.service
 }

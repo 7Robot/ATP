@@ -6,3 +6,4 @@ add_executable(usbdaemon usbdaemon.c settings.c ini.c devicemanager.c device.c
 target_link_libraries(usbdaemon libatp)
 
 install(TARGETS usbdaemon RUNTIME DESTINATION bin)
+install(FILES usbdaemon.conf DESTINATION /etc COMPONENT config)
