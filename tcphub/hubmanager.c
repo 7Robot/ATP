@@ -42,8 +42,8 @@ void sighandler(int signal)
                 value = WEXITSTATUS(status);
                 for (i = 0 ; i < hub_count ; i++) {
                     if (hubs[PID(i)] == pid) {
-                        printf("[%5d] tcphub terminated with status code %d\n",
-                                hubs[PORT(i)], value);
+                        fprintf(stderr, "[%5d] tcphub terminated with status "
+                                "code %d\n", hubs[PORT(i)], value);
                         hub_dead++;
                         break;
                     }
@@ -52,14 +52,14 @@ void sighandler(int signal)
                 value = WTERMSIG(status);
                 for (i = 0 ; i < hub_count ; i++) {
                     if (hubs[PID(i)] == pid) {
-                        printf("[%5d] tcphub terminated by signal %d\n",
-                                hubs[PORT(i)], value);
+                        fprintf(stderr, "[%5d] tcphub terminated by signal "
+                                "%d\n", hubs[PORT(i)], value);
                         hub_dead++;
                         break;
                     }
                 }
             } else {
-                printf("event for process %d\n", pid);
+                fprintf(stderr, "event for process %d\n", pid);
             }
         }
     }
@@ -153,7 +153,8 @@ int start_tcphub(const char *port, const char *decoder)
     if (decoder == NULL) {
         decoder = "default";
     }
-    printf("[%5d] tcphub launched with pid %d, decoder: %s\n", p, pid, decoder);
+    fprintf(stderr, "[%5d] tcphub launched with pid %d, decoder: %s\n",
+            p, pid, decoder);
     return 0;
 }
 
