@@ -62,10 +62,11 @@ int loadports(const char *filename)
 
     if ((ret = ini_parse(filename, handler, NULL)) != 0) {
         if (ret < 0) {
-            printf("Warning: can't open config file '%s' (%m)\n", filename);
+            fprintf(stderr, "Warning: can't open config file '%s' (%m)\n",
+                    filename);
             return -1;
         } else {
-            printf("Warning: errors occurred during config file"
+            fprintf(stderr, "Warning: errors occurred during config file"
                     " parsing (first error at line %d)\n", ret);
         }
     }

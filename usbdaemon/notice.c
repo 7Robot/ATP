@@ -10,7 +10,7 @@ void notice(enum notice type, const char *path)
 
 void notice_idfail(const char *path, int id)
 {
-    printf("[ID %d FAIL] %s\n", id, path);
+    fprintf(stderr, "[ID %d FAIL] %s\n", id, path);
 }
 
 void notice_sock(enum notice type, const char *path, const char *host,
@@ -18,24 +18,24 @@ void notice_sock(enum notice type, const char *path, const char *host,
 {
     switch (type) {
         case ADD:
-            printf("[OPEN     ] %s\n", path);
+            fprintf(stderr, "[OPEN     ] %s\n", path);
             break;
         case ADDFAIL:
-            printf("[FAIL     ] %s\n", path);
+            fprintf(stderr, "[FAIL     ] %s\n", path);
             break;
         case DEL:
-            printf("[CLOSE    ] %s\n", path);
+            fprintf(stderr, "[CLOSE    ] %s\n", path);
             break;
         case NEW:
-            printf("[NEW      ] %s\n", path);
+            fprintf(stderr, "[NEW      ] %s\n", path);
             break;
         case CONNECT:
-            printf("[CONNECTED] %s ↔ %s:%s\n", path, host, service);
+            fprintf(stderr, "[CONNECTED] %s ↔ %s:%s\n", path, host, service);
             break;
         case SOCKFAIL:
-            printf("[FAIL     ] %s ↔ %s:%s\n", path, host, service);
+            fprintf(stderr, "[FAIL     ] %s ↔ %s:%s\n", path, host, service);
             break;
         default:
-            printf("[?????????] %s\n", path);
+            fprintf(stderr, "[?????????] %s\n", path);
     }
 }

@@ -103,12 +103,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Gateway settings:\n");
-    printf("\tHost: %s\n", host);
-    printf("\tSpeed: %d\n", speed);
-    printf("\tMonitoring device in: %s\n", basedir);
+    fprintf(stderr, "Gateway settings:\n");
+    fprintf(stderr, "\tHost: %s\n", host);
+    fprintf(stderr, "\tSpeed: %d\n", speed);
+    fprintf(stderr, "\tMonitoring device in: %s\n", basedir);
     if (configfile) {
-        printf("\tConfig file: %s\n", configfile);
+        fprintf(stderr, "\tConfig file: %s\n", configfile);
         if (loadports(configfile) < 0) {
             fprintf(stderr, "Warning: using defaults ports instead\n");
         }
@@ -220,5 +220,6 @@ void gateway(int inotifyfd)
 
 void usage(const char *cmd)
 {
-    printf("Usage: %s [-h host] [-s speed] [-c config_file] [-d device_dir]\n", cmd);
+    fprintf(stderr, "Usage: %s [-h host] [-s speed] [-c config_file] "
+            "[-d device_dir]\n", cmd);
 }
