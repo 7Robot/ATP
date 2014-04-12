@@ -8,12 +8,15 @@ url="http://7robot.fr"
 license=('GPL')
 makedepends=('cmake')
 backup=('etc/usbdaemon.conf')
-source=('usbdaemon.service')
-md5sums=('8e2fa5c16c72c4dddf073252292930f0')
+source=('usbdaemon.service'
+        'hubmanager.service')
+md5sums=('8e2fa5c16c72c4dddf073252292930f0'
+         '1b6313f76451c8190dad5c7ef636f00c')
 
 _gitteam="7Robot"
 _gitname="ATP"
-_gitroot="https://github.com/$_gitteam/$_gitname"
+#_gitroot="https://github.com/$_gitteam/$_gitname"
+_gitroot="/data/git/delta/7robot-eurobot"
 
 build() {
   cd "$srcdir"
@@ -45,4 +48,5 @@ package() {
 
   cd "$srcdir"
   install -Dm644 usbdaemon.service "$pkgdir"/usr/lib/systemd/system/usbdaemon.service
+  install -Dm644 hubmanager.service "$pkgdir"/usr/lib/systemd/system/hubmanager.service
 }
