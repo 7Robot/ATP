@@ -4,7 +4,6 @@ import argparse, configparser
 import sys
 import socket
 
-from atp import encode, decode
 from atp.protos import load as load_protos
 from atp.channel import Channel, print_packet
 

@@ -39,6 +39,7 @@ class Channel:
                 self._logger.warning("unexpected '%s' argument" %arg)
 
         self._stream = stream
+        self._callback = callback
         self._proto_name = proto_name.lower()
         self._proto = proto
 
@@ -74,7 +75,7 @@ class Channel:
                 if len(args) == len(packet['args']) + 2:
                     arguments['timestamp'] = args[-2]
                     arguments['microseconds'] = args[-1]
-                callback(packet_name, arguments)
+                self._callback(packet_name, arguments)
 
         thread = decode(stream, recv, follow)
 
