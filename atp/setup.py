@@ -7,7 +7,7 @@ setup(
     author_email='elie+7robot@bouttier.eu.org',
     packages=['atp'],
     scripts=['atp-encode', 'atp-decode', 'atp-protos', 'atp-gen',
-        'atp-channel'],
+        'atp-channel', 'atp-webserver'],
     data_files=[('/etc', ['atp.conf'])],
     url='http://7robot.fr',
     description='7Robot Eurobot - ATP module.',

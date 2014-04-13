@@ -107,7 +107,8 @@ if __name__ == "__main__":
     parser.add_argument('-H', '--host', dest='host',
             help='Set host of tcphub.')
     parser.add_argument('-P', '--port', dest='port',
-            help='Set base port (effective port = base port + board id).')
+            help='Set tcphub base port '
+            '(effective port = base port + board id).')
     args = parser.parse_args()
 
     app = QtGui.QApplication(sys.argv)
