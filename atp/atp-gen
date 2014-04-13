@@ -39,7 +39,7 @@ if __name__=="__main__":
     elif 'atp' in config and 'board' in config['atp']:
         board = config['atp']['board'].capitalize()
 
-    print("Reading semantic from '%s'" %args.semantic)
+    print("Reading semantic from '%s'" %semantic_file)
     print("Saving files in '%s'\n" %args.dest)
     print("Generating files for %s board…\n" %board)
 
