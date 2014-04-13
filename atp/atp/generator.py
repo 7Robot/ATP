@@ -102,7 +102,7 @@ class PicGenerator:
             os.makedirs(dest)
         self.dest = dest
 
-        self.protos = load(semantic)
+        self.protos = semantic
 
         self.formats = dict((v[1],k) for k, v in formats.items())
 

@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+
+import sys, os
+import socket
+
+import argparse
+import configparser
+
+from PyQt4 import QtCore, QtGui
+
+from atp.channel import Channel, print_packet
+from atp.protos import load as load_protos
+
+
+class AtpSender(QtGui.QTabWidget):
+
+    def __init__(self, host, port, protos, **kwargs):
+        super(AtpSender, self).__init__()
+        self.host = host
+        self.port = int(port)
+        self.transmitter = 'arm'
+        for arg in kwargs:
+            if arg == 'transmitter':
+                self.transmitter = kwargs[arg]
+            else:
+                print("Warning: unexpected '%s' argument" %arg, file=sys.stderr)
+        self.protos = protos
+        self.error = QtGui.QErrorMessage()
+        self.initUI()
+
+    def initUI(self):
+        QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
+        self.resize(300, 500)
+        self.setWindowTitle('ATP Sender')
+
+        for proto in self.protos:
+            self.addTab(self.createProto(proto, self.protos[proto]), proto)
+
+        self.show()
+
+    def createProto(self, name, proto):
+        scroll = QtGui.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameStyle(QtGui.QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        layout = QtGui.QVBoxLayout()
+        widget = QtGui.QWidget()
+        sock = socket.socket()
+        try:
+            sock.connect((self.host, self.port + proto["id"]))
+        except:
+            print ("Failed to connect on %s %d" % (self.host, self.port))
+            sys.exit(-1)
+        file = sock.makefile(mode="rw")
+        chan = Channel(file.buffer, print_packet, name, proto,
+                transmitter = self.transmitter)
+        chan._file_ = file # archi moche
+        for packet in proto['packets']:
+            if proto['packets'][packet]['transmitter'] == self.transmitter \
+                    or proto['packets'][packet]['transmitter'] == 'both' \
+                    or self.transmitter == 'both':
+                layout.addWidget(self.createPacket(packet,
+                    proto['packets'][packet], chan), 0)
+        widget.setLayout(layout)
+        scroll.setWidget(widget)
+        return scroll
+
+    def createPacket(self, name, packet, chan):
+        group = QtGui.QGroupBox(name)
+        group.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        layout = QtGui.QGridLayout()
+        texts = []
+        row = 0
+        eventHandler = lambda: self.send(name, packet, texts, chan)
+        for arg in packet['args']:
+            label = QtGui.QLabel(arg)
+            text = QtGui.QLineEdit()
+            texts.append([arg, text])
+            text.returnPressed.connect(eventHandler)
+            layout.addWidget(label, row, 0)
+            layout.addWidget(text, row, 1)
+            row = row + 1
+        send = QtGui.QPushButton("Send")
+        send.clicked.connect(eventHandler)
+        layout.addWidget(send, row, 0, row, 2)
+        group.setLayout(layout)
+        return group
+
+    def send(self, name, packet, texts, chan):
+        args = list(map(lambda x: x[1].text(), texts))
+        try:
+            chan.send(name, packet, *args)
+        except Exception as e:
+            self.error.showMessage(str(e))
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='GUI to send ATP packets.')
+    parser.add_argument('-c', '--config', dest='config',
+            default='/etc/atp.conf',
+            help='Set configuration file.')
+    parser.add_argument('-s', '--semantic', dest='semantic',
+            help='Set semantic configuration file.')
+    parser.add_argument('-t', '--transmitter', dest='transmitter',
+            default='arm',
+            help='Generate input field for arm message, pic message or both.')
+    parser.add_argument('-H', '--host', dest='host',
+            help='Set host of tcphub.')
+    parser.add_argument('-P', '--port', dest='port',
+            help='Set base port (effective port = base port + board id).')
+    args = parser.parse_args()
+
+    app = QtGui.QApplication(sys.argv)
+ 
+    config = configparser.ConfigParser()
+    config.read(args.config)
+
+    semantic_file = args.semantic
+    if not semantic_file and 'atp' in config and 'semantic' in config['atp']:
+        semantic_file = config['atp']['semantic']
+    if not semantic_file:
+        print("Error: can't found semantic file.", file=sys.stderr)
+        sys.exit(1)
+    protos = load_protos(semantic_file)
+
+    host = args.host
+    if not host and 'atp' in config and 'host' in config['atp']:
+        host = config['atp']['host']
+    if not host:
+        print("Error: can't determine host.", file=sys.stderr)
+        sys.exit(1)
+
+    port = args.port
+    if not port and 'atp' in config and 'port' in config['atp']:
+        port = config['atp']['port']
+    if not port:
+        print("Error: can't determine port.", file=sys.stderr)
+        sys.exit(1)
+
+    sender = AtpSender(host, port, protos,
+            transmitter = args.transmitter)
+
+    os._exit(app.exec_())

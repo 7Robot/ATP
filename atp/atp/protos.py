@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
-
 import inspect
 from collections import OrderedDict
 import importlib.abc
+import configparser
 
 import imp as _imp
 import os as _os 
+import sys
 
 cformats = { 'B' : 'unsigned char',
             'H' : 'unsigned int',
@@ -98,13 +98,14 @@ def load_proto(version, common, proto):
 
     return p
 
-def load(conf):
+def load(semantic_file):
 
-    f = open(conf)
+    f = open(semantic_file)
     source = f.read()
-    code = compile(source, conf, 'exec')
-    l = { "Proto": Proto, "Packet": Packet }
-    g = { "Proto": Proto, "Packet": Packet }
+    code = compile(source, semantic_file, 'exec')
+    # don't ask, it works
+    l = { "Proto": Proto, "Packet": Packet } # locals
+    g = { "Proto": Proto, "Packet": Packet } # globals
     exec(code, g, l)
 
     protos = OrderedDict()

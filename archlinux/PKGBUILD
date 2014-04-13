@@ -1,12 +1,12 @@
 # Maintainer: Elie Bouttier <elie+aur@bouttier.eu.org>
 pkgname=7robot-eurobot-git
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="7Robot Eurobot - ATP related source"
 arch=(i686 x86_64)
 url="http://7robot.fr"
 license=('GPL')
-makedepends=('cmake')
+makedepends=('cmake' 'git')
 backup=('etc/usbdaemon.conf')
 source=('usbdaemon.service'
         'hubmanager.service')
@@ -15,8 +15,7 @@ md5sums=('8e2fa5c16c72c4dddf073252292930f0'
 
 _gitteam="7Robot"
 _gitname="ATP"
-#_gitroot="https://github.com/$_gitteam/$_gitname"
-_gitroot="/data/git/delta/7robot-eurobot"
+_gitroot="https://github.com/$_gitteam/$_gitname"
 
 build() {
   cd "$srcdir"

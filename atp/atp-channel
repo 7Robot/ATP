@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+import argparse, configparser
+import sys
+import socket
+
+from atp import encode, decode
+from atp.protos import load as load_protos
+from atp.channel import Channel, print_packet
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Decode ATP packets with semantical traduction.')
+    parser.add_argument('-c', '--config', dest='config',
+            default='/etc/atp.conf',
+            help='Set configuration file.')
+    parser.add_argument('-s', '--semantic', dest='semantic',
+            help='Set semantic configuration file.')
+    parser.add_argument("-b", "--board", dest='board',
+            help='Set board protocol.')
+    parser.add_argument('-t', '--transmitter', dest='transmitter',
+            help='Generate send functions for arm message, '
+            'pic message or both.')
+    parser.add_argument("-r", "--remote", dest='remote',
+            help="Connect to remote host (HOST:PORT).")
+    parser.add_argument('-f', '--follow', dest='follow', action='store_true',
+            help='Output appended data as the file grows.')
+    parser.add_argument('-i', '--ipython', dest='ipython', action='store_true',
+            help='Launch ipython shell (need --remote).')
+    args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read(args.config)
+
+    semantic_file = args.semantic
+    if not semantic_file and 'atp' in config and 'semantic' in config['atp']:
+        semantic_file = config['atp']['semantic']
+    if not semantic_file:
+        print("Error: can't found semantic file.", file=sys.stderr)
+        sys.exit(1)
+    protos = load_protos(semantic_file)
+
+    board = args.board
+    if not board and 'atp' in config and 'board' in config['atp']:
+        board = config['atp']['board']
+    if not board:
+        print("Error: please specify board protocol to use.", file=sys.stderr)
+        sys.exit(1)
+    board = board.capitalize()
+
+    if not board in protos:
+        print("Error: unknow board protocol '%s' (available: %s)."
+                %(board, ','.join(protos.keys())), file=sys.stderr)
+        sys.exit(1)
+    proto = protos[board]
+
+    stream = sys.stdin.buffer
+
+    if args.remote:
+        try:
+            host, port = args.remote.split(':')
+        except ValueError:
+            print("%s: error: address must be in HOST:PORT format" %sys.argv[0])
+            sys.exit(1)
+        try:
+            port = int(port)
+        except ValueError:
+            print("%s: error: PORT must be an positive integer" %sys.argv[0])
+            sys.exit(1)
+        try:
+            sock = socket.socket()
+            sock.connect((host, port))
+        except Exception as e:
+            print("%s:" %sys.argv[0], e)
+            sys.exit(1)
+        file = sock.makefile(mode="rw")
+        stream = file.buffer
+
+    transmitter = args.transmitter
+    if not transmitter and 'atp' in config and 'transmitter' in config['atp']:
+        transmitter = config['atp']['transmitter']
+
+    if args.remote and args.ipython:
+        callback = lambda x, y: None
+    else:
+        callback = print_packet
+
+    channel = Channel(stream, callback, board.lower(), proto,
+            transmitter = transmitter, follow = args.follow)
+
+    if args.remote and args.ipython:
+        from IPython import embed
+        embed()

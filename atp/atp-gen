@@ -1,32 +1,51 @@
 #!/usr/bin/env python3
 
 import sys
-import argparse
+import argparse, configparser
 
 from atp.generator import PicGenerator
+from atp.protos import load as load_protos
 
 
 if __name__=="__main__":
 
-    parser = argparse.ArgumentParser(description='Generate pic source code to encode and decode ATP paquet with semantic.')
-    parser.add_argument('semantic', help='Set semantic configuration file.')
-    parser.add_argument('dest', help='Set destination directory.')
-    parser.add_argument('-p', '--proto', dest='proto', help='Generate source code for a specific protocol/pic.')
+    parser = argparse.ArgumentParser(description='Generate pic source code to '
+            'encode and decode ATP paquet with semantic.')
+    parser.add_argument('dest',
+            help='Set destination directory.')
+    parser.add_argument('-c', '--config', dest='config',
+            default='/etc/atp.conf',
+            help='Set configuration file.')
+    parser.add_argument('-s', '--semantic', dest='semantic',
+            help='Set semantic configuration file.')
+    parser.add_argument('-b', '--board', dest='board',
+            help='Generate source code for a specific board.')
     args = parser.parse_args()
 
-    if args.proto:
-        proto = args.proto.capitalize()
-    else:
-        proto = "all"
+    config = configparser.ConfigParser()
+    config.read(args.config)
 
+    semantic_file = args.semantic
+    if not semantic_file and 'atp' in config and 'semantic' in config['atp']:
+        semantic_file = config['atp']['semantic']
+    if not semantic_file:
+        print("Error: can't found semantic file.", file=sys.stderr)
+        sys.exit(1)
+    protos = load_protos(semantic_file)
+
+    board = "All"
+    if args.board:
+        board = args.proto.capitalize()
+    elif 'atp' in config and 'board' in config['atp']:
+        board = config['atp']['board'].capitalize()
 
     print("Reading semantic from '%s'" %args.semantic)
     print("Saving files in '%s'\n" %args.dest)
-    print("Generating files for %s protocol…\n" %proto)
+    print("Generating files for %s board…\n" %board)
 
-    generator = PicGenerator(args.semantic, args.dest)
+    generator = PicGenerator(protos, args.dest)
 
-    if proto == "all":
+    if board == "All":
         generator.genAll()
     else:
-        generator.genProto(proto, generator.protos[proto])
+        generator.genProto(board, generator.protos[board])
