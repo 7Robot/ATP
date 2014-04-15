@@ -269,5 +269,5 @@ if __name__ == "__main__":
                 proto_name, proto, transmitter = 'both')
 
     httpd = socketserver.TCPServer(("", int(listen)), ATPHandler)
-    print("Server listening on port", args.listen)
+    print("Server listening on port", listen)
     httpd.serve_forever()
