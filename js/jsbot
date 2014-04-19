@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+
+
+import argparse, configparser
+import sys, time, re
+import socket
+import pyinotify
+from threading import Thread
+
+from jsread import jsread
+from atp.channel import Channel
+from atp.protos import load as load_protos
+
+
+DEVICESDIR = "/dev/input/"
+REGEXP = '^js[0-9]+$'
+DELAY = 0.1
+
+# Vitesse max
+Vmax = 80
+# Omega max
+Omax = 40
+# Z max
+Zmax = 1023
+
+
+class SpeedOrder(Thread):
+
+    # TODO : utiliser un mutex sur x et y, et utiliser une condition dans le run
+
+    def __init__(self, asserv, delay = DELAY):
+        super().__init__()
+        self.asserv = asserv
+        self.delay = delay
+        self.x = 0
+        self.old_x = 0
+        self.y = 0
+        self.old_y = 0
+        self.z = 0
+        self.old_z = 0
+
+    def update(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def run(self):
+        while True:
+            time.sleep(self.delay)
+            if self.x != self.old_x or self.y != self.old_y or self.z != self.old_z:
+                self.old_x = self.x
+                self.old_y = self.y
+                self.old_z = self.z
+                self.send_command(self.x, self.y, self.z)
+
+    def send_command(self, _x, _y, _z):
+        #print(_x, _y, _z)
+        from math import floor, ceil
+
+        #x = (_x * Vmax) / 32767
+        #y = (_y * Vmax) / 32767
+        #left = - round((Vmax * (y + x)) / (Vmax + abs(x)))
+        #right = - round((Vmax * (y - x)) / (Vmax + abs(x)))
+
+        v = - round((_y * Vmax) / 32767)
+        theta = - round((_x * Omax) / 32767)
+
+        z = round((_z * Zmax) / 65536 + Zmax / 2)
+
+        #print("[%+3d %+3d] (%4d)" %(right, left, z))
+        print("[%+3d] (%+3d) (%4d)" %(v, theta, z))
+        self.asserv.speedOmega(v/100.0, theta/100.0, 1, 1, 1, 1)
+
+class Processor:
+    def __init__(self, host, port, proto_name, proto):
+        print(host, port)
+        self.sock = socket.socket()
+        self.sock.connect((host, int(port)))
+        self.asserv_file = self.sock.makefile(mode='rw')
+        self.asserv = Channel(self.asserv_file.buffer,
+                lambda name, args: print(name),
+                proto_name, proto)
+        self.states = None
+        self.speed = SpeedOrder(self.asserv)
+        self.speed.start()
+        #self.sock2 = socket.socket()
+        #self.sock2.connect((HOST, PORT+6))
+        #self.mother_file = self.sock2.makefile(mode='rw')
+        #self.mother = Channel(self.mother_file.buffer,
+        #        lambda name, args: name, proto = 'mother')
+
+    def event(self, axes, buttons):
+        #print(axes, buttons)
+        self.pince = axes[2] < 0
+        self.speed.update(axes[0], axes[1], axes[2])
+        if self.states and len(self.states) == len(buttons):
+            try:
+                for i in range(len(buttons)):
+                    if self.states[i] == 0 and buttons[i] == 1:
+                        #print("Button %d pressed!" %i)
+                        if self.pince:
+                            if i == 2:
+                                self.mother.sortirPince()
+                            elif i == 3:
+                                self.mother.getNombreVerres()
+                            elif i == 0:
+                                self.mother.chopperVerre()
+                            elif i == 1:
+                                self.mother.lacherVerres()
+                        else:
+                            if i == 2:
+                                self.mother.BougiesOn()
+                            elif i == 3:
+                                self.mother.BougiesOff()
+                            elif i == 0:
+                                self.mother.BougiesHitBot()
+                            elif i == 1:
+                                self.mother.BougiesHitTop()
+                        if i == 4:
+                            self.mother.startAX12()
+                        elif i == 5:
+                            self.mother.FunnyAction()
+                        elif i == 6:
+                            self.mother.stopAX12()
+                        elif i == 7:
+                            self.asserv.stop()
+            except Exception as e:
+                print("Warning: %s." %e)
+        self.states = buttons
+
+
+class MyHandler(pyinotify.ProcessEvent):
+
+    def __init__(self, host, port, proto_name, proto):
+        super().__init__()
+        self.processor = Processor(host, port, proto_name, proto)
+        self.re = re.compile(REGEXP)
+
+    def open(self, name, pathname):
+        if self.re.match(name):
+            print("Opening %s…" %pathname)
+            time.sleep(0.1)
+            jsread(pathname, self.processor.event)
+
+    def process_IN_CREATE(self, event):
+        self.open(event.name, event.pathname)
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Control robot with joystick.')
+    parser.add_argument('-c', '--config', dest='config',
+            default='/etc/atp.conf',
+            help='Set configuration file.')
+    parser.add_argument('-s', '--semantic', dest='semantic',
+            help='Set semantic configuration file.')
+    parser.add_argument('-b', '--board', dest='board', default='asserv',
+            help='Set asserv board name.')
+    parser.add_argument('-H', '--host', dest='host',
+            help='Connect to the specified host.')
+    parser.add_argument('-P', '--port', dest='port',
+            help='Exact port to connect to the board. '
+            'If not specified, use the base port specified in config file'
+            ', and add the board id.')
+    args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read(args.config)
+
+    semantic_file = args.semantic
+    if not semantic_file and 'atp' in config and 'semantic' in config['atp']:
+        semantic_file = config['atp']['semantic']
+    if not semantic_file:
+        print("Error: can't found semantic file.", file=sys.stderr)
+        sys.exit(1)
+    protos = load_protos(semantic_file)
+
+    proto_name = args.board.capitalize()
+    if not proto_name in protos:
+        print("Error: unable to determine board to use.", file=sys.stderr)
+        sys.exit(1)
+    proto = protos[proto_name]
+
+    host = args.host
+    if not host and 'atp' in config and 'host' in config['atp']:
+        host = config['atp']['host']
+    if not host:
+        print("Error: can't determine host.", file=sys.stderr)
+        sys.exit(1)
+
+    port = args.port
+    if not port and 'atp' in config and 'port' in config['atp']:
+        port = config['atp']['port']
+    if not port:
+        print("Error: can't determine port.", file=sys.stderr)
+        sys.exit(1)
+    else:
+        port = int(port) + int(proto['id'])
+
+    wm = pyinotify.WatchManager()
+    handler = MyHandler(host, port, proto_name, proto)
+    notifier = pyinotify.Notifier(wm, default_proc_fun=handler)
+    wm.add_watch(DEVICESDIR, pyinotify.IN_CREATE)
+
+    import glob
+    import os.path
+    for device in glob.glob(os.path.join(DEVICESDIR, '*')):
+        handler.open(os.path.basename(device), device)
+
+    notifier.loop()
