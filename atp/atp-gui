@@ -120,7 +120,7 @@ if __name__ == "__main__":
     if not semantic_file and 'atp' in config and 'semantic' in config['atp']:
         semantic_file = config['atp']['semantic']
     if not semantic_file:
-        print("Error: can't found semantic file.", file=sys.stderr)
+        print("Error: can't find semantic file.", file=sys.stderr)
         sys.exit(1)
     protos = load_protos(semantic_file)
 
