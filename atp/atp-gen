@@ -41,7 +41,7 @@ if __name__=="__main__":
 
     print("Reading semantic from '%s'" %semantic_file)
     print("Saving files in '%s'\n" %args.dest)
-    print("Generating files for %s board…\n" %board)
+    print("Generating files for %s board...\n" %board)
 
     generator = PicGenerator(protos, args.dest)
 
