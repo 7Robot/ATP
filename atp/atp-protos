@@ -38,7 +38,7 @@ if __name__ == "__main__":
         config.read(conf)
         if 'atp' in config and 'semantic' in config['atp']:
             semantic = config['atp']['semantic']
-    if not semantic_file:
+    if not semantic:
         print("Error: can't find semantic file.", file=sys.stderr)
         sys.exit(1)
 
