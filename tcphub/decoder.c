@@ -88,4 +88,6 @@ loaded:
         return -1;
     }
     recvbufsize = *bufsize;
+
+    return 0;
 }
