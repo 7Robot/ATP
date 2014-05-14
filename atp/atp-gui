@@ -52,7 +52,7 @@ class AtpSender(QtGui.QTabWidget):
             print ("Failed to connect on %s %d" % (self.host, self.port))
             sys.exit(-1)
         file = sock.makefile(mode="rw")
-        chan = Channel(file.buffer, print_packet, name, proto,
+        chan = Channel(file.buffer, lambda x, y: print_packet("%s:%s" %(name, x), y), name, proto,
                 transmitter = self.transmitter)
         chan._file_ = file # archi moche
         for packet in proto['packets']:
