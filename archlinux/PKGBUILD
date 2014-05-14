@@ -1,11 +1,12 @@
 # Maintainer: Elie Bouttier <elie+aur@bouttier.eu.org>
 pkgname=7robot-eurobot-git
 pkgver=1.0
-pkgrel=4
+pkgrel=5
 pkgdesc="7Robot Eurobot - ATP related source"
 arch=(i686 x86_64)
 url="http://7robot.fr"
 license=('GPL')
+depends=('python' 'python-pyqt4')
 makedepends=('cmake' 'git')
 backup=('etc/usbdaemon.conf',
         'etc/atp.conf')
