@@ -35,8 +35,8 @@ template_decoder = """
 
 template_h = """// Generated from version ${VERSION} of semantic
 
-#ifndef _${PROTO_UPPER}_H_
-#define _${PROTO_UPPER}_H_
+#ifndef _ATP_${PROTO_UPPER}_H_
+#define _ATP_${PROTO_UPPER}_H_
 
 #define BOARD_ID ${ID}
 #define BOARD_NAME ${PROTO}
