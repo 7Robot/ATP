@@ -5,7 +5,7 @@ After=hubmanager.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/usbdaemon -c /etc/usbdaemon.conf -h %I -w 500
+ExecStart=/usr/bin/usbdaemon -c /etc/usbdaemon.conf -h %I -w 2000
 Restart=always
 
 [Install]
