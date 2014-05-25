@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 
     if (wait) {
         fprintf(stderr, "Waiting for TCPHUB ... ");
-        usleep(wait);
+        usleep(wait * 1000);
         fprintf(stderr, "hop that it is ok\n");
     }
 
@@ -235,5 +235,5 @@ void gateway(int inotifyfd)
 void usage(const char *cmd)
 {
     fprintf(stderr, "Usage: %s [-h host] [-s speed] [-c config_file] "
-            "[-d device_dir]\n", cmd);
+            "[-d device_dir] [-w waiting_time_in_ms]\n", cmd);
 }
