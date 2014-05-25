@@ -1,7 +1,7 @@
 # Maintainer: Elie Bouttier <elie+aur@bouttier.eu.org>
 pkgname=7robot-eurobot-git
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 pkgdesc="7Robot Eurobot - ATP related source"
 arch=(i686 x86_64)
 url="http://7robot.fr"
@@ -15,8 +15,8 @@ source=('usbdaemon.service'
         'tcphub@.service'
         'hubmanager.service'
         'jsbot.service')
-md5sums=('8e2fa5c16c72c4dddf073252292930f0'
-         '16893586552dbdb1ef005aacbd2d3d2a'
+md5sums=('d2ca165582657d868fed74f53e8ba454'
+         '8ca9233a2817fc7e71bd1378ca134f16'
          'cdddd7c0b8b7daddc03e3d7936a74f5b'
          '1b6313f76451c8190dad5c7ef636f00c'
          '38be735b00dfbd51ccbbea938f74b2c2')
