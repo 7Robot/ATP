@@ -6,7 +6,8 @@ pkgdesc="7Robot Eurobot - ATP related source"
 arch=(i686 x86_64)
 url="http://7robot.fr"
 license=('GPL')
-depends=('python' 'python-pyqt4')
+depends=('python')
+optdepends=('python-pyqt4')
 makedepends=('cmake' 'git')
 backup=('etc/usbdaemon.conf',
         'etc/atp.conf')
