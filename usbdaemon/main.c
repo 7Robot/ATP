@@ -234,5 +234,5 @@ void gateway(int inotifyfd)
 
 void usage(const char *cmd)
 {
-    printf("Usage: %s [-h host] [-s speed] [-c config_file] [-d device_dir]\n", cmd);
+    printf("Usage: %s [-h host] [-s speed] [-c config_file] [-d device_dir] [-w waitingtime(ms)]\n", cmd);
 }
