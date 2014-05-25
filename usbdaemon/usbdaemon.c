@@ -27,6 +27,7 @@ int filter(const char *filename);
 int main(int argc, char *argv[])
 {
     int option, inotifyfd;
+    int wait = 0;
     char *env;
     char *opt_host = NULL;
     char *configfile = NULL;
@@ -44,6 +45,10 @@ int main(int argc, char *argv[])
     env = getenv(ENV_PREFIX"_SPEED");
     if ((env != NULL) && (strlen(env) != 0)) {
         sscanf(env, "%d", &speed);
+    }
+    env = getenv(ENV_PREFIX"_WAIT");
+    if ((env != NULL) && (strlen(env) != 0)) {
+        sscanf(env, "%d", &wait);
     }
     env = getenv(ENV_PREFIX"_CONFIG");
     if ((env != NULL) && (strlen(env) != 0)) {
@@ -65,7 +70,7 @@ int main(int argc, char *argv[])
 
     opterr = 1;
     while (1) {
-        option = getopt(argc, argv, "h:s:c:d:");
+        option = getopt(argc, argv, "h:s:c:d:w:");
         if (option == -1)
             break;
         switch (option) {
@@ -79,6 +84,9 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 sscanf(optarg, "%d", &speed);
+                break;
+            case 'w':
+                sscanf(optarg, "%d", &wait);
                 break;
             case 'c':
                 if ((configfile = malloc(strlen(optarg) + 1)) == NULL) {
@@ -112,6 +120,12 @@ int main(int argc, char *argv[])
         if (loadports(configfile) < 0) {
             fprintf(stderr, "Warning: using defaults ports instead\n");
         }
+    }
+
+    if (wait) {
+        fprintf(stderr, "Waiting for TCPHUB ... ");
+        usleep(wait);
+        fprintf(stderr, "hop that it is ok\n");
     }
 
     if (addexistingdevices(basedir) < 0) {
