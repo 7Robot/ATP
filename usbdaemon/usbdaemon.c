@@ -17,6 +17,7 @@
 #define MAX_DEVICE      16
 
 const char *basedir = "/dev";
+const char *devicefilter = "ttyUSB%d";
 
 void usage(const char *cmd);
 int addexistingdevices(const char *dir);
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
     char *opt_host = NULL;
     char *configfile = NULL;
     char *opt_basedir = NULL;
+    char *opt_devicefilter = NULL;
 
     env = getenv(ENV_PREFIX"_HOST");
     if ((env != NULL) && (strlen(env) != 0)) {
@@ -66,6 +68,15 @@ int main(int argc, char *argv[])
         }
         strcpy(opt_basedir, env);
         basedir = opt_basedir;
+    }
+    env = getenv(ENV_PREFIX"_FILTER");
+    if ((env != NULL) && (strlen(env) != 0)) {
+        if ((opt_devicefilter = malloc(strlen(env) + 1)) == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
+        strcpy(opt_devicefilter, env);
+        devicefilter = opt_devicefilter;
     }
 
     opterr = 1;
@@ -103,6 +114,14 @@ int main(int argc, char *argv[])
                 strcpy(opt_basedir, optarg);
                 basedir = opt_basedir;
                 break;
+            case 'f':
+                if ((opt_devicefilter = malloc(strlen(optarg) + 1)) == NULL) {
+                    perror("malloc");
+                    exit(EXIT_FAILURE);
+                }
+                strcpy(opt_devicefilter, optarg);
+                devicefilter = opt_devicefilter;
+                break;
             case '?':
                 usage(argv[0]);
                 exit(EXIT_FAILURE);
@@ -115,6 +134,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "\tHost: %s\n", host);
     fprintf(stderr, "\tSpeed: %d\n", speed);
     fprintf(stderr, "\tMonitoring device in: %s\n", basedir);
+    fprintf(stderr, "\tDevice filter: %s\n", devicefilter);
     if (configfile) {
         fprintf(stderr, "\tConfig file: %s\n", configfile);
         if (loadports(configfile) < 0) {
@@ -144,7 +164,7 @@ int main(int argc, char *argv[])
 int filter(const char *filename)
 {
     int a;
-    return sscanf(filename, "ttyUSB%d", &a) == 1;
+    return sscanf(filename, devicefilter, &a) == 1;
 }
 
 int addexistingdevices(const char *basedir)
