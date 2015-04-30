@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     opterr = 1;
     while (1) {
-        option = getopt(argc, argv, "h:s:c:d:w:");
+        option = getopt(argc, argv, "h:s:c:d:w:f:");
         if (option == -1)
             break;
         switch (option) {
